@@ -7,9 +7,10 @@ import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import ua.hillelit.lms.api.Loggable;
 import ua.hillelit.lms.exceptions.FileMaxSizeReachedException;
 
-public class FileLogger {
+public class FileLogger implements Loggable {
 
   private long fileSize;
   private int countLog;

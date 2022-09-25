@@ -8,25 +8,21 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import ua.hillelit.lms.api.Configurable;
 
-public class FileLoggerConfiguration implements Configurable {
+public class StdoutLoggerConfiguration implements Configurable {
 
-  private String file;
   private LoggingLevel level;
-  private long maxSize;
   private String format;
 
-  public FileLoggerConfiguration(String file, LoggingLevel level, long maxSize, String format) {
-    this.file = file;
+  public StdoutLoggerConfiguration(LoggingLevel level, String format) {
     this.level = level;
-    this.maxSize = maxSize;
     this.format = format;
   }
 
-  public FileLoggerConfiguration() {
+  public StdoutLoggerConfiguration() {
     load();
   }
 
-  public FileLoggerConfiguration load() {
+  public StdoutLoggerConfiguration load() {
     try (InputStream input = Files.newInputStream(Paths.get("resources/loggerConfig.properties"))) {
 
       Properties prop = new Properties();
@@ -35,9 +31,8 @@ public class FileLoggerConfiguration implements Configurable {
       prop.load(input);
 
       // get the property value
-      file = prop.getProperty("logger.file");
+
       level = levelConfig(prop.getProperty("logger.level"));
-      maxSize = Long.parseLong(prop.getProperty("logger.max_size"));
       format = prop.getProperty("logger.format");
 
     } catch (NoSuchFileException ex) {
@@ -46,7 +41,7 @@ public class FileLoggerConfiguration implements Configurable {
       ex.printStackTrace();
     }
 
-    return new FileLoggerConfiguration(file, level, maxSize, format);
+    return new StdoutLoggerConfiguration(level, format);
   }
 
   private LoggingLevel levelConfig(String config) {
@@ -62,19 +57,12 @@ public class FileLoggerConfiguration implements Configurable {
 
   }
 
-  public String getFile() {
-    return file;
-  }
-
   public LoggingLevel getLevel() {
     return level;
-  }
-
-  public long getMaxSize() {
-    return maxSize;
   }
 
   public String getFormat() {
     return format;
   }
+
 }
