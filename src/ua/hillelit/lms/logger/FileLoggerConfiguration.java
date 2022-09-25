@@ -1,11 +1,11 @@
 package ua.hillelit.lms.logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import ua.hillelit.lms.exceptions.LoggerConfigFormatException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 public class FileLoggerConfiguration {
 
@@ -24,57 +24,27 @@ public class FileLoggerConfiguration {
   public FileLoggerConfiguration() {
   }
 
-  public String readConfigFile() throws FileNotFoundException {
+  public FileLoggerConfiguration load() {
+    try (InputStream input = Files.newInputStream(Paths.get("resources/loggerConfig.properties"))) {
 
-    File loggerConfig = new File("LoggerConfig.txt");
+      Properties prop = new Properties();
 
-    StringBuilder configStr = new StringBuilder();
+      // load a properties file
+      prop.load(input);
 
-    try (Reader reader = new FileReader(loggerConfig)) {
-      int s;
-      while ((s = reader.read()) != -1) {
-        configStr.append((char) s);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+      // get the property value
+      file = prop.getProperty("logger.file");
+      level = levelConfig(prop.getProperty("logger.level"));
+      maxSize = Long.parseLong(prop.getProperty("logger.max_size"));
+      format = prop.getProperty("logger.format");
+
+    } catch (NoSuchFileException ex) {
+      System.out.println("*File [loggerConfig.properties] is empty");
+    } catch (IOException ex) {
+      ex.printStackTrace();
     }
 
-    return configStr.toString();
-  }
-
-  private String[] parsingConfigStr(String str) {
-
-    str = str.replaceAll("[\\w-]+:", "");
-
-    String[] strArr = str.split("\n");
-
-    for (int i = 0; i < strArr.length; i++) {
-      strArr[i] = strArr[i].trim();
-    }
-
-    validateConfigFormat(strArr);
-
-    return strArr;
-  }
-
-  private void validateConfigFormat(String[] strArr) {
-    String time = "CURRENT_TIME";
-    if (!strArr[3].contains(time)) {
-      throw new LoggerConfigFormatException("FORMAT: " + strArr[3] +
-          " wrong keyword [" + time + "]");
-    }
-
-    String level = "LEVEL";
-    if (!strArr[3].contains(level)) {
-      throw new LoggerConfigFormatException("FORMAT: " + strArr[3] +
-          " wrong keyword [" + level + "]");
-    }
-
-    String message = "STRING-MESSAGE";
-    if (!strArr[3].contains(message)) {
-      throw new LoggerConfigFormatException("FORMAT: " + strArr[3] +
-          " wrong keyword [" + message + "]");
-    }
+    return new FileLoggerConfiguration(file, level, maxSize, format);
   }
 
   private LoggingLevel levelConfig(String config) {
@@ -86,25 +56,6 @@ public class FileLoggerConfiguration {
         return LoggingLevel.DEBUG;
       default:
         return null;
-    }
-
-  }
-
-  public FileLoggerConfiguration load() {
-
-    try {
-
-      String[] configArr = parsingConfigStr(readConfigFile());
-
-      String file = configArr[0];
-      LoggingLevel level = levelConfig(configArr[1]);
-      long maxSize = Long.parseLong(configArr[2]);
-      String format = configArr[3];
-
-      return new FileLoggerConfiguration(file, level, maxSize, format);
-
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
     }
 
   }

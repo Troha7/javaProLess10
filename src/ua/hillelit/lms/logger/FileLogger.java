@@ -46,12 +46,10 @@ public class FileLogger {
 
   private String logMassage(String level, String massage) {
 
-    String logMassage = config.getFormat() + "\n";
-    logMassage = logMassage.replace("CURRENT_TIME", currentDate("d.M.y-HH:mm:ss"));
-    logMassage = logMassage.replace("LEVEL", level);
-    logMassage = logMassage.replace("STRING-MESSAGE", massage);
+    String logFormat = config.getFormat();
+    String date = currentDate("d.M.y-HH:mm:ss");
 
-    return logMassage;
+    return String.format(logFormat, date, level, massage) + "\n";
   }
 
   private void writeToLog(String level, String massage) {
