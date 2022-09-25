@@ -26,8 +26,9 @@ public class FileLoggerConfiguration implements Configurable {
     load();
   }
 
-  public FileLoggerConfiguration load() {
-    try (InputStream input = Files.newInputStream(Paths.get("resources/loggerConfig.properties"))) {
+  public void load() {
+    try (InputStream input = Files.newInputStream(
+        Paths.get("resources/loggerConfig.properties"))) {
 
       Properties prop = new Properties();
 
@@ -46,7 +47,7 @@ public class FileLoggerConfiguration implements Configurable {
       ex.printStackTrace();
     }
 
-    return new FileLoggerConfiguration(file, level, maxSize, format);
+    new FileLoggerConfiguration(file, level, maxSize, format);
   }
 
   private LoggingLevel levelConfig(String config) {

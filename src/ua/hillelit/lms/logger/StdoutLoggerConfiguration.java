@@ -22,7 +22,7 @@ public class StdoutLoggerConfiguration implements Configurable {
     load();
   }
 
-  public StdoutLoggerConfiguration load() {
+  public void load() {
     try (InputStream input = Files.newInputStream(Paths.get("resources/loggerConfig.properties"))) {
 
       Properties prop = new Properties();
@@ -41,7 +41,7 @@ public class StdoutLoggerConfiguration implements Configurable {
       ex.printStackTrace();
     }
 
-    return new StdoutLoggerConfiguration(level, format);
+    new StdoutLoggerConfiguration(level, format);
   }
 
   private LoggingLevel levelConfig(String config) {
